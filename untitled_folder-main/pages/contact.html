@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - CivicPulse Community Voting Platform</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="site-header">
+      <div class="header-left">
+        <button id="sidebarToggle" class="burger-menu" aria-label="Toggle Sidebar">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        <h1 class="site-title">CivicPulse</h1>
+      </div>
+      <div class="site-actions">
+        <div class="user-menu" id="userMenu" style="display:none"></div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="sun-icon">☀️</span>
+          <span class="moon-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Primary Navigation">
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="../index.html">
+          <span class="nav-icon"><i class="fas fa-home"></i></span>
+          <span class="nav-label">Home</span>
+        </a>
+        
+        <div id="loggedInNav" style="display: none;">
+          <a class="nav-item" href="../issues/create.html">
+            <span class="nav-icon"><i class="fas fa-plus-circle"></i></span>
+            <span class="nav-label">Post Issue</span>
+          </a>
+          <a class="nav-item active" href="contact.html">
+            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+            <span class="nav-label">Contact</span>
+          </a>
+          <a class="nav-item" href="about.html">
+            <span class="nav-icon"><i class="fas fa-info-circle"></i></span>
+            <span class="nav-label">About Us</span>
+          </a>
+          
+          <div id="adminNav" style="display: none;">
+            <div class="nav-divider"></div>
+            <div class="nav-section-title">Admin</div>
+            <a class="nav-item" href="../admin/dashboard.html">
+              <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+              <span class="nav-label">Dashboard</span>
+            </a>
+            <a class="nav-item" href="../admin/users.html">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span class="nav-label">User Management</span>
+            </a>
+            <a class="nav-item" href="../admin/moderation.html">
+              <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
+              <span class="nav-label">Moderation</span>
+            </a>
+            <a class="nav-item" href="../admin/settings.html">
+              <span class="nav-icon"><i class="fas fa-cog"></i></span>
+              <span class="nav-label">Settings</span>
+            </a>
+          </div>
+          
+          <div class="nav-divider"></div>
+          <a class="nav-item" href="../auth/logout.html">
+            <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+            <span class="nav-label">Logout</span>
+          </a>
+        </div>
+        
+        <div id="loggedOutNav">
+          <a class="nav-item" href="../auth/register.html">
+            <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
+            <span class="nav-label">Register</span>
+          </a>
+          <a class="nav-item" href="../auth/login.html">
+            <span class="nav-icon"><i class="fas fa-sign-in-alt"></i></span>
+            <span class="nav-label">Login</span>
+          </a>
+          <a class="nav-item active" href="contact.html">
+            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+            <span class="nav-label">Contact</span>
+          </a>
+          <a class="nav-item" href="about.html">
+            <span class="nav-icon"><i class="fas fa-info-circle"></i></span>
+            <span class="nav-label">About Us</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="main-content">
+      <!-- Contact Section -->
+      <section class="contact-section">
+        <div class="container">
+          <div class="contact-header">
+            <h1>Contact Us</h1>
+            <p class="lead">Have questions about community voting or need support? We're here to help!</p>
+          </div>
+
+          <div class="contact-content">
+            <div class="contact-grid">
+              <!-- Contact Form -->
+              <div class="contact-form-card">
+                <h2>Send us a Message</h2>
+                <form id="contactForm" class="contact-form">
+                  <input type="hidden" id="csrf_token" name="csrf_token" />
+                  <div class="form-group">
+                    <label for="name" class="form-label">Full Name *</label>
+                    <input type="text" id="name" name="name" class="form-input" required>
+                    <div class="form-error" id="name-error" style="display:none"></div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="email" class="form-label">Email Address *</label>
+                    <input type="email" id="email" name="email" class="form-input" required>
+                    <div class="form-error" id="email-error" style="display:none"></div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="subject" class="form-label">Subject *</label>
+                    <select id="subject" name="subject" class="form-select" required>
+                      <option value="">Select a topic</option>
+                      <option value="general">General Inquiry</option>
+                      <option value="registration">Registration Support</option>
+                      <option value="technical">Technical Issue</option>
+                      <option value="community">Community Partnership</option>
+                      <option value="feedback">Platform Feedback</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="issue_category" class="form-label">Issue Category (if applicable)</label>
+                    <select id="issue_category" name="issue_category" class="form-select">
+                      <option value="">Select category</option>
+                      <option value="infrastructure">Infrastructure</option>
+                      <option value="sanitation">Sanitation</option>
+                      <option value="transportation">Transportation</option>
+                      <option value="safety">Public Safety</option>
+                      <option value="environment">Environment</option>
+                      <option value="healthcare">Healthcare</option>
+                      <option value="education">Education</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="message" class="form-label">Message *</label>
+                    <textarea id="message" name="message" rows="5" class="form-textarea" required placeholder="Tell us how we can help you..."></textarea>
+                  </div>
+                  
+                  <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                      <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <!-- Contact Information -->
+              <div class="contact-info-card">
+                <h2>Get in Touch</h2>
+                <div class="contact-info">
+                  <div class="contact-item">
+                    <div class="contact-icon">
+                      <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="contact-details">
+                      <h3>Email</h3>
+                      <p>support@civicpulse.org</p>
+                      <p>partnerships@civicpulse.org</p>
+                    </div>
+                  </div>
+                  
+                  <div class="contact-item">
+                    <div class="contact-icon">
+                      <i class="fas fa-phone"></i>
+                    </div>
+                    <div class="contact-details">
+                      <h3>Phone</h3>
+                      <p>+977-1-4XXXXXXX</p>
+                      <p>Mon-Fri: 9:00 AM - 6:00 PM</p>
+                    </div>
+                  </div>
+                  
+                  <div class="contact-item">
+                    <div class="contact-icon">
+                      <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="contact-details">
+                      <h3>Office</h3>
+                      <p>CivicPulse Headquarters</p>
+                      <p>Kathmandu, Nepal</p>
+                    </div>
+                  </div>
+                  
+                  <div class="contact-item">
+                    <div class="contact-icon">
+                      <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="contact-details">
+                      <h3>Response Time</h3>
+                      <p>We typically respond within 24 hours during business days.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="quick-links">
+                  <h3>Quick Links</h3>
+                  <ul>
+                    <li><a href="about.html"><i class="fas fa-info-circle"></i> About Our Platform</a></li>
+                    <li><a href="../auth/register.html"><i class="fas fa-user-plus"></i> Register as Citizen</a></li>
+                    <li><a href="../auth/login.html"><i class="fas fa-sign-in-alt"></i> Login to Platform</a></li>
+                    <li><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links" style="display:flex;gap:16px;justify-content:center;padding:16px 0;">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Success Modal -->
+  <div id="successModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-check-circle"></i> Message Sent Successfully!</h2>
+      </div>
+      <div class="modal-body">
+        <p>Thank you for contacting us. We'll get back to you within 24 hours.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeSuccessModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/theme.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script>
+    // Handle contact form submission
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fetch CSRF token
+      fetch('../api/security/csrf.php', { credentials: 'include' })
+        .then(r => r.json())
+        .then(d => { const f = document.getElementById('csrf_token'); if (f && d && d.csrf_token) f.value = d.csrf_token; })
+        .catch(() => {});
+      const contactForm = document.getElementById('contactForm');
+      contactForm.addEventListener('submit', handleContactSubmit);
+    });
+
+    async function handleContactSubmit(e) {
+      e.preventDefault();
+      
+      const form = e.target;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+      
+      try {
+        // Convert form data to JSON including CSRF
+        const formData = new FormData(form);
+        const formObject = {};
+        formData.forEach((value, key) => { formObject[key] = value; });
+        const response = await fetch('../api/contact.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formObject) });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showSuccessModal();
+          form.reset();
+          Utils.showNotification('Message sent successfully!', 'success');
+        } else {
+          showError(result.message || 'Failed to send message. Please try again.');
+        }
+      } catch (error) {
+        console.error('Contact form error:', error);
+        showError('An error occurred while sending your message. Please try again.');
+      } finally {
+        // Reset button state
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    }
+
+    function showSuccessModal() {
+      const modal = document.getElementById('successModal');
+      modal.style.display = 'block';
+    }
+
+    function closeSuccessModal() {
+      const modal = document.getElementById('successModal');
+      modal.style.display = 'none';
+    }
+
+    function showError(message) {
+      // Create error notification
+      const notification = document.createElement('div');
+      notification.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+      notification.style.cssText = 'top: 20px; right:20px; z-index: 9999; min-width: 300px;';
+      notification.innerHTML = `
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 5000);
+    }
+  </script>
+</body>
+</html>

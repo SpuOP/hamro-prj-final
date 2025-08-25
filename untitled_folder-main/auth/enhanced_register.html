@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enhanced Registration - CivicPulse Community Voting Platform</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script>
+    // Theme initialization
+    (function(){
+      try {
+        var theme = localStorage.getItem('theme');
+        if (!theme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          theme = 'dark';
+        }
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
+  <style>
+    .registration-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .step-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    
+    .step-indicator::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--border-color);
+      z-index: 1;
+    }
+    
+    .step {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-primary);
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all var(--transition-normal);
+    }
+    
+    .step.active {
+      border-color: var(--accent-color);
+      background: var(--accent-color);
+      color: white;
+    }
+    
+    .step.completed {
+      border-color: var(--success);
+      background: var(--success);
+      color: white;
+    }
+    
+    .step-label {
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--border-color);
+      border-radius: 4px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-color), var(--accent-hover));
+      border-radius: 4px;
+      transition: width var(--transition-normal);
+      width: 16.67%; /* 1/6 steps */
+    }
+    
+    .form-step {
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .form-step.active {
+      display: block;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all var(--transition-fast);
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+    }
+    
+    .form-group input.error,
+    .form-group select.error,
+    .form-group textarea.error {
+      border-color: var(--danger);
+    }
+    
+    .field-error {
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    
+    .file-upload {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .file-upload:hover {
+      border-color: var(--accent-color);
+      background: var(--bg-secondary);
+    }
+    
+    .file-upload.dragover {
+      border-color: var(--accent-color);
+      background: var(--bg-secondary);
+    }
+    
+    .file-preview {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      display: none;
+    }
+    
+    .file-preview img {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: var(--radius-md);
+    }
+    
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      width: auto;
+    }
+    
+    .step-navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: var(--accent-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn-secondary:hover {
+      background: var(--bg-tertiary);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+    
+    .summary-label {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    
+    .summary-value {
+      color: var(--text-secondary);
+      text-align: right;
+      max-width: 60%;
+    }
+    
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .step-indicator {
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      
+      .step-label {
+        font-size: 0.75rem;
+      }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="site-header">
+      <div class="header-left">
+        <a href="../index.html" class="back-link">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1 class="site-title">
+          <i class="fas fa-vote-yea"></i>
+          CivicPulse Registration
+        </h1>
+      </div>
+      
+      <div class="site-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <input type="checkbox" id="themeToggleCheckbox" aria-hidden="true">
+          <span class="theme-slider"></span>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="registration-container">
+        <div class="text-center mb-4">
+          <h1>Join CivicPulse Community</h1>
+          <p class="lead">Complete your registration to participate in community voting and issue reporting</p>
+        </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+          <div class="step active" data-step="1">
+            <span>1</span>
+            <div class="step-label">Personal Info</div>
+          </div>
+          <div class="step" data-step="2">
+            <span>2</span>
+            <div class="step-label">Address</div>
+          </div>
+          <div class="step" data-step="3">
+            <span>3</span>
+            <div class="step-label">Documents</div>
+          </div>
+          <div class="step" data-step="4">
+            <span>4</span>
+            <div class="step-label">Additional</div>
+          </div>
+          <div class="step" data-step="5">
+            <span>5</span>
+            <div class="step-label">Security</div>
+          </div>
+          <div class="step" data-step="6">
+            <span>6</span>
+            <div class="step-label">Review</div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Registration Form -->
+        <form id="registrationForm" enctype="multipart/form-data">
+          <!-- Step 1: Personal Information -->
+          <div class="form-step active" id="step1">
+            <h2>Personal Information</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="first_name">First Name *</label>
+                <input type="text" id="first_name" name="first_name" required>
+              </div>
+              <div class="form-group">
+                <label for="last_name">Last Name *</label>
+                <input type="text" id="last_name" name="last_name" required>
+              </div>
+              <div class="form-group">
+                <label for="middle_name">Middle Name</label>
+                <input type="text" id="middle_name" name="middle_name">
+              </div>
+              <div class="form-group">
+                <label for="date_of_birth">Date of Birth *</label>
+                <input type="date" id="date_of_birth" name="date_of_birth" required>
+              </div>
+              <div class="form-group">
+                <label for="gender">Gender *</label>
+                <select id="gender" name="gender" required>
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="phone_country_code">Country Code</label>
+                <select id="phone_country_code" name="phone_country_code">
+                  <option value="+977">+977 (Nepal)</option>
+                  <option value="+91">+91 (India)</option>
+                  <option value="+880">+880 (Bangladesh)</option>
+                  <option value="+1">+1 (USA/Canada)</option>
+                  <option value="+44">+44 (UK)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone">
+              </div>
+              <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
+              </div>
+              <div class="form-group">
+                <label for="alternative_email">Alternative Email</label>
+                <input type="email" id="alternative_email" name="alternative_email">
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Address & Location -->
+          <div class="form-step" id="step2">
+            <h2>Address & Location Details</h2>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label for="current_address">Current Address *</label>
+                <textarea id="current_address" name="current_address" rows="3" required placeholder="Enter your full street address"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="ward_area">Ward/Area</label>
+                <input type="text" id="ward_area" name="ward_area" placeholder="e.g., Ward 1, Baneshwor">
+              </div>
+              <div class="form-group">
+                <label for="city_id">City/Municipality *</label>
+                <select id="city_id" name="city_id" required>
+                  <option value="">Select city</option>
+                  <option value="1">Kathmandu</option>
+                  <option value="2">Lalitpur</option>
+                  <option value="3">Bhaktapur</option>
+                  <option value="4">Pokhara</option>
+                  <option value="5">Biratnagar</option>
+                  <option value="6">Birgunj</option>
+                  <option value="7">Dharan</option>
+                  <option value="8">Butwal</option>
+                  <option value="9">Hetauda</option>
+                  <option value="10">Nepalgunj</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="district">District/State</label>
+                <input type="text" id="district" name="district" placeholder="e.g., Bagmati">
+              </div>
+              <div class="form-group">
+                <label for="metro_area_id">Metro/Sub-metro Area</label>
+                <select id="metro_area_id" name="metro_area_id">
+                  <option value="">Select metro area</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="postal_code">Postal/ZIP Code</label>
+                <input type="text" id="postal_code" name="postal_code">
+              </div>
+              <div class="form-group">
+                <label for="residence_duration">How long living in this area? *</label>
+                <select id="residence_duration" name="residence_duration" required>
+                  <option value="">Select duration</option>
+                  <option value="<1_year">Less than 1 year</option>
+                  <option value="1-3_years">1-3 years</option>
+                  <option value="3-5_years">3-5 years</option>
+                  <option value="5+_years">5+ years</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Identity Verification -->
+          <div class="form-step" id="step3">
+            <h2>Identity Verification</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="document_type">Document Type *</label>
+                <select id="document_type" name="document_type" required>
+                  <option value="">Select document type</option>
+                  <option value="nic">NIC (National ID Card)</option>
+                  <option value="citizenship">Citizenship Certificate</option>
+                  <option value="driving_license">Driving License</option>
+                  <option value="passport">Passport</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="document_number">Document Number</label>
+                <input type="text" id="document_number" name="document_number" placeholder="Enter document number">
+              </div>
+              <div class="form-group">
+                <label for="document_expiry">Document Expiry Date</label>
+                <input type="date" id="document_expiry" name="document_expiry">
+              </div>
+              <div class="form-group full-width">
+                <label for="document_file">Identity Document Upload *</label>
+                <div class="file-upload" id="documentUpload">
+                  <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                  <p>Click to upload or drag and drop</p>
+                  <p class="text-muted">PDF, JPG, PNG (Max 5MB)</p>
+                  <input type="file" id="document_file" name="document_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;" required>
+                </div>
+                <div class="file-preview" id="documentPreview"></div>
+              </div>
+              <div class="form-group full-width">
+                <label for="proof_of_address_file">Proof of Address Upload</label>
+                <div class="file-upload" id="addressUpload">
+                  <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                  <p>Click to upload or drag and drop</p>
+                  <p class="text-muted">Utility bill, rental agreement, etc. (Max 5MB)</p>
+                  <input type="file" id="proof_of_address_file" name="proof_of_address_file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                </div>
+                <div class="file-preview" id="addressPreview"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Additional Information -->
+          <div class="form-step" id="step4">
+            <h2>Additional Information</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="occupation">Occupation/Profession</label>
+                <select id="occupation" name="occupation">
+                  <option value="">Select occupation</option>
+                  <option value="student">Student</option>
+                  <option value="employed">Employed</option>
+                  <option value="self_employed">Self-employed</option>
+                  <option value="business_owner">Business Owner</option>
+                  <option value="government_employee">Government Employee</option>
+                  <option value="retired">Retired</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="education_level">Education Level</label>
+                <select id="education_level" name="education_level">
+                  <option value="">Select education level</option>
+                  <option value="high_school">High School</option>
+                  <option value="bachelors">Bachelor's Degree</option>
+                  <option value="masters">Master's Degree</option>
+                  <option value="phd">PhD</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label>Interested Issue Categories</label>
+                <div class="checkbox-group">
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="cat_infrastructure" name="interested_categories[]" value="infrastructure">
+                    <label for="cat_infrastructure">Infrastructure Development</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="cat_safety" name="interested_categories[]" value="safety">
+                    <label for="cat_safety">Public Safety & Security</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="cat_environment" name="interested_categories[]" value="environment">
+                    <label for="cat_environment">Environmental Issues</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="cat_transportation" name="interested_categories[]" value="transportation">
+                    <label for="cat_transportation">Transportation & Traffic</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="cat_healthcare" name="interested_categories[]" value="healthcare">
+                    <label for="cat_healthcare">Healthcare & Social Services</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="cat_economic" name="interested_categories[]" value="economic_development">
+                    <label for="cat_economic">Economic Development</label>
+                  </div>
+                  <div class="checkbox-item">
+                    <input type="checkbox" id="cat_housing" name="interested_categories[]" value="housing_urban_planning">
+                    <label for="cat_housing">Housing & Urban Planning</label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="referral_source">How did you hear about this platform?</label>
+                <select id="referral_source" name="referral_source">
+                  <option value="">Select source</option>
+                  <option value="social_media">Social Media</option>
+                  <option value="friend_family">Friend/Family</option>
+                  <option value="local_government">Local Government</option>
+                  <option value="news_article">News Article</option>
+                  <option value="search_engine">Search Engine</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5: Account Security -->
+          <div class="form-step" id="step5">
+            <h2>Account Security</h2>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" name="password" required>
+                <div class="password-strength" id="passwordStrength"></div>
+              </div>
+              <div class="form-group">
+                <label for="confirm_password">Confirm Password *</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+              </div>
+              <div class="form-group">
+                <label for="security_question_1">Security Question 1 *</label>
+                <select id="security_question_1" name="security_question_1" required>
+                  <option value="">Select a question</option>
+                  <option value="What was your first pet's name?">What was your first pet's name?</option>
+                  <option value="In which city were you born?">In which city were you born?</option>
+                  <option value="What was your mother's maiden name?">What was your mother's maiden name?</option>
+                  <option value="What was the name of your first school?">What was the name of your first school?</option>
+                  <option value="What is your favorite book?">What is your favorite book?</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="security_answer_1">Security Answer 1 *</label>
+                <input type="text" id="security_answer_1" name="security_answer_1" required>
+              </div>
+              <div class="form-group">
+                <label for="security_question_2">Security Question 2 *</label>
+                <select id="security_question_2" name="security_question_2" required>
+                  <option value="">Select a question</option>
+                  <option value="What is your favorite color?">What is your favorite color?</option>
+                  <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                  <option value="What is the name of the street you grew up on?">What is the name of the street you grew up on?</option>
+                  <option value="What is your favorite movie?">What is your favorite movie?</option>
+                  <option value="What is the name of your favorite teacher?">What is the name of your favorite teacher?</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="security_answer_2">Security Answer 2 *</label>
+                <input type="text" id="security_answer_2" name="security_answer_2" required>
+              </div>
+              <div class="form-group full-width">
+                <div class="checkbox-item">
+                  <input type="checkbox" id="terms_agreement" name="terms_agreement" required>
+                  <label for="terms_agreement">I agree to the Terms & Conditions *</label>
+                </div>
+              </div>
+              <div class="form-group full-width">
+                <div class="checkbox-item">
+                  <input type="checkbox" id="privacy_agreement" name="privacy_agreement" required>
+                  <label for="privacy_agreement">I agree to the Privacy Policy *</label>
+                </div>
+              </div>
+              <div class="form-group full-width">
+                <div class="checkbox-item">
+                  <input type="checkbox" id="newsletter_subscription" name="newsletter_subscription">
+                  <label for="newsletter_subscription">Subscribe to email newsletter (optional)</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 6: Review & Submit -->
+          <div class="form-step" id="step6">
+            <h2>Review & Submit</h2>
+            <div class="summary-section" id="summarySection">
+              <!-- Summary will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Step Navigation -->
+          <div class="step-navigation">
+            <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+              <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <button type="button" class="btn btn-primary" id="nextBtn">
+              Next <i class="fas fa-arrow-right"></i>
+            </button>
+            <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">
+              <i class="fas fa-paper-plane"></i> Submit Registration
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="successModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-check-circle"></i> Registration Submitted!</h2>
+      </div>
+      <div class="modal-body">
+        <p>Thank you for registering with CivicPulse! Your application has been submitted and is under review.</p>
+        <p>You will receive an email confirmation shortly. Once approved, you'll get your special login ID to access the platform.</p>
+      </div>
+      <div class="modal-footer">
+        <a href="../index.html" class="btn btn-primary">Go to Homepage</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/theme.js"></script>
+  <script>
+    let currentStep = 1;
+    const totalSteps = 6;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeForm();
+      setupFileUploads();
+      setupCityMetroRelationship();
+      setupPasswordStrength();
+      setupFormValidation();
+    });
+    
+    function initializeForm() {
+      const nextBtn = document.getElementById('nextBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      nextBtn.addEventListener('click', nextStep);
+      prevBtn.addEventListener('click', previousStep);
+      
+      updateStepIndicator();
+      updateProgressBar();
+    }
+    
+    function nextStep() {
+      if (validateCurrentStep()) {
+        if (currentStep < totalSteps) {
+          currentStep++;
+          updateStepDisplay();
+        }
+      }
+    }
+    
+    function previousStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepDisplay();
+      }
+    }
+    
+    function updateStepDisplay() {
+      // Hide all steps
+      for (let i = 1; i <= totalSteps; i++) {
+        document.getElementById(`step${i}`).classList.remove('active');
+      }
+      
+      // Show current step
+      document.getElementById(`step${currentStep}`).classList.add('active');
+      
+      // Update navigation buttons
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      if (currentStep === 1) {
+        prevBtn.style.display = 'none';
+      } else {
+        prevBtn.style.display = 'inline-flex';
+      }
+      
+      if (currentStep === totalSteps) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'inline-flex';
+        populateSummary();
+      } else {
+        nextBtn.style.display = 'inline-flex';
+        submitBtn.style.display = 'none';
+      }
+      
+      updateStepIndicator();
+      updateProgressBar();
+    }
+    
+    function updateStepIndicator() {
+      for (let i = 1; i <= totalSteps; i++) {
+        const step = document.querySelector(`[data-step="${i}"]`);
+        step.classList.remove('active', 'completed');
+        
+        if (i === currentStep) {
+          step.classList.add('active');
+        } else if (i < currentStep) {
+          step.classList.add('completed');
+        }
+      }
+    }
+    
+    function updateProgressBar() {
+      const progress = (currentStep / totalSteps) * 100;
+      document.getElementById('progressFill').style.width = progress + '%';
+    }
+    
+    function validateCurrentStep() {
+      const currentStepElement = document.getElementById(`step${currentStep}`);
+      const requiredFields = currentStepElement.querySelectorAll('[required]');
+      let isValid = true;
+      
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          showFieldError(field, 'This field is required');
+          isValid = false;
+        } else {
+          clearFieldError(field);
+        }
+      });
+      
+      // Additional validation for specific steps
+      if (currentStep === 1) {
+        isValid = validateStep1() && isValid;
+      } else if (currentStep === 5) {
+        isValid = validateStep5() && isValid;
+      }
+      
+      return isValid;
+    }
+    
+    function validateStep1() {
+      let isValid = true;
+      
+      // Age validation (must be 18+)
+      const dob = document.getElementById('date_of_birth').value;
+      if (dob) {
+        const birthDate = new Date(dob);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        
+        if (age < 18 || (age === 18 && monthDiff < 0)) {
+          showFieldError(document.getElementById('date_of_birth'), 'You must be at least 18 years old to register');
+          isValid = false;
+        }
+      }
+      
+      return isValid;
+    }
+    
+    function validateStep5() {
+      let isValid = true;
+      
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      
+      if (password !== confirmPassword) {
+        showFieldError(document.getElementById('confirm_password'), 'Passwords do not match');
+        isValid = false;
+      }
+      
+      if (password.length < 8) {
+        showFieldError(document.getElementById('password'), 'Password must be at least 8 characters long');
+        isValid = false;
+      }
+      
+      return isValid;
+    }
+    
+    function showFieldError(field, message) {
+      clearFieldError(field);
+      
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'field-error';
+      errorDiv.textContent = message;
+      
+      field.parentNode.appendChild(errorDiv);
+      field.classList.add('error');
+    }
+    
+    function clearFieldError(field) {
+      const errorDiv = field.parentNode.querySelector('.field-error');
+      if (errorDiv) {
+        errorDiv.remove();
+      }
+      field.classList.remove('error');
+    }
+    
+    function setupFileUploads() {
+      setupFileUpload('documentUpload', 'document_file', 'documentPreview');
+      setupFileUpload('addressUpload', 'proof_of_address_file', 'addressPreview');
+    }
+    
+    function setupFileUpload(uploadId, fileInputId, previewId) {
+      const upload = document.getElementById(uploadId);
+      const fileInput = document.getElementById(fileInputId);
+      const preview = document.getElementById(previewId);
+      
+      upload.addEventListener('click', () => fileInput.click());
+      
+      upload.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        upload.classList.add('dragover');
+      });
+      
+      upload.addEventListener('dragleave', () => {
+        upload.classList.remove('dragover');
+      });
+      
+      upload.addEventListener('drop', (e) => {
+        e.preventDefault();
+        upload.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          fileInput.files = files;
+          handleFileSelect(fileInput, preview);
+        }
+      });
+      
+      fileInput.addEventListener('change', () => {
+        handleFileSelect(fileInput, preview);
+      });
+    }
+    
+    function handleFileSelect(fileInput, preview) {
+      const file = fileInput.files[0];
+      if (file) {
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+          alert('File size must be less than 5MB');
+          fileInput.value = '';
+          return;
+        }
+        
+        preview.style.display = 'block';
+        
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          preview.innerHTML = `<p><i class="fas fa-file"></i> ${file.name}</p>`;
+        }
+      }
+    }
+    
+    function setupCityMetroRelationship() {
+      const citySelect = document.getElementById('city_id');
+      const metroSelect = document.getElementById('metro_area_id');
+      
+      citySelect.addEventListener('change', () => {
+        metroSelect.innerHTML = '<option value="">Select metro area</option>';
+        
+        const cityId = citySelect.value;
+        if (cityId) {
+          // This would typically fetch from an API
+          // For now, we'll use static data
+          const metroAreas = {
+            '1': ['Thamel', 'Baneshwor', 'Pulchowk', 'Jawalakhel'],
+            '2': ['Patan Durbar Square', 'Kupondole', 'Balkumari'],
+            '3': ['Bhaktapur Durbar Square', 'Thimi', 'Suryabinayak'],
+            '4': ['Lakeside', 'Mahendrapool', 'Chipledhunga'],
+            '5': ['Biratnagar Central', 'Biratnagar Suburban'],
+            '6': ['Birgunj Central', 'Birgunj Suburban'],
+            '7': ['Dharan Central', 'Dharan Suburban'],
+            '8': ['Butwal Central', 'Butwal Suburban'],
+            '9': ['Hetauda Central', 'Hetauda Suburban'],
+            '10': ['Nepalgunj Central', 'Nepalgunj Suburban']
+          };
+          
+          const areas = metroAreas[cityId] || [];
+          areas.forEach(area => {
+            const option = document.createElement('option');
+            option.value = area.toLowerCase().replace(/\s+/g, '_');
+            option.textContent = area;
+            metroSelect.appendChild(option);
+          });
+        }
+      });
+    }
+    
+    function setupPasswordStrength() {
+      const password = document.getElementById('password');
+      const strengthDiv = document.getElementById('passwordStrength');
+      
+      password.addEventListener('input', () => {
+        const value = password.value;
+        let strength = 0;
+        let feedback = '';
+        
+        if (value.length >= 8) strength++;
+        if (/[a-z]/.test(value)) strength++;
+        if (/[A-Z]/.test(value)) strength++;
+        if (/[0-9]/.test(value)) strength++;
+        if (/[^A-Za-z0-9]/.test(value)) strength++;
+        
+        switch(strength) {
+          case 0:
+          case 1:
+            feedback = '<span style="color: var(--danger);">Very Weak</span>';
+            break;
+          case 2:
+            feedback = '<span style="color: var(--warning);">Weak</span>';
+            break;
+          case 3:
+            feedback = '<span style="color: var(--warning);">Fair</span>';
+            break;
+          case 4:
+            feedback = '<span style="color: var(--success);">Good</span>';
+            break;
+          case 5:
+            feedback = '<span style="color: var(--success);">Strong</span>';
+            break;
+        }
+        
+        strengthDiv.innerHTML = `Password Strength: ${feedback}`;
+      });
+    }
+    
+    function setupFormValidation() {
+      const form = document.getElementById('registrationForm');
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (!validateCurrentStep()) {
+          return;
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        
+        try {
+          const formData = new FormData(form);
+          
+          // Convert to JSON for API
+          const formObject = {};
+          formData.forEach((value, key) => {
+            if (key === 'interested_categories[]') {
+              if (!formObject[key.replace('[]', '')]) {
+                formObject[key.replace('[]', '')] = [];
+              }
+              formObject[key.replace('[]', '')].push(value);
+            } else {
+              formObject[key] = value;
+            }
+          });
+          
+          // Handle file uploads
+          const documentFile = document.getElementById('document_file').files[0];
+          const addressFile = document.getElementById('proof_of_address_file').files[0];
+          
+          if (documentFile) {
+            formObject.document_file = documentFile;
+          }
+          if (addressFile) {
+            formObject.proof_of_address_file = addressFile;
+          }
+          
+          // Submit to API
+          const response = await fetch('../api/auth/register.php', {
+            method: 'POST',
+            body: JSON.stringify(formObject)
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            document.getElementById('successModal').style.display = 'block';
+          } else {
+            alert('Registration failed: ' + (result.message || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Registration error:', error);
+          alert('An error occurred during registration. Please try again.');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      });
+    }
+    
+    function populateSummary() {
+      const summarySection = document.getElementById('summarySection');
+      const formData = new FormData(document.getElementById('registrationForm'));
+      
+      let summaryHTML = '';
+      
+      // Personal Information
+      summaryHTML += '<h3>Personal Information</h3>';
+      summaryHTML += `<div class="summary-item"><span class="summary-label">Full Name:</span><span class="summary-value">${formData.get('first_name')} ${formData.get('middle_name')} ${formData.get('last_name')}</span></div>`;
+      summaryHTML += `<div class="summary-item"><span class="summary-label">Date of Birth:</span><span class="summary-value">${formData.get('date_of_birth')}</span></div>`;
+      summaryHTML += `<div class="summary-item"><span class="summary-label">Gender:</span><span class="summary-value">${formData.get('gender')}</span></div>`;
+      summaryHTML += `<div class="summary-item"><span class="summary-label">Email:</span><span class="summary-value">${formData.get('email')}</span></div>`;
+      
+      // Address
+      summaryHTML += '<h3>Address & Location</h3>';
+      summaryHTML += `<div class="summary-item"><span class="summary-label">Address:</span><span class="summary-value">${formData.get('current_address')}</span></div>`;
+      summaryHTML += `<div class="summary-item"><span class="summary-label">City:</span><span class="summary-value">${document.getElementById('city_id').options[document.getElementById('city_id').selectedIndex].text}</span></div>`;
+      
+      // Documents
+      summaryHTML += '<h3>Identity Verification</h3>';
+      summaryHTML += `<div class="summary-item"><span class="summary-label">Document Type:</span><span class="summary-value">${formData.get('document_type')}</span></div>`;
+      
+      summarySection.innerHTML = summaryHTML;
+    }
+  </script>
+</body>
+</html>

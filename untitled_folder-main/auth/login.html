@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - CivicPulse</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <style>
+    :root { --bg: #0b1020; --card: rgba(255,255,255,0.08); --text: #e8eaf6; --muted:#a3a8c3; --primary:#7c3aed; --primary-2:#8b5cf6; --ring:#a78bfa; --error:#ef4444; --success:#10b981; }
+    @media (prefers-color-scheme: light) { :root { --bg:#f6f7fb; --card:#ffffffcc; --text:#0f172a; --muted:#475569; } }
+    body { min-height:100vh; margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Poppins, sans-serif; color: var(--text); background: radial-gradient(1200px 600px at 20% -10%, #2b2f55 0%, transparent 60%), radial-gradient(1000px 500px at 100% 0%, #3a2e69 0%, transparent 60%), linear-gradient(180deg, #0b1020 0%, #131a2e 60%, #0b1020 100%); }
+    .header { background: transparent; position: relative; z-index: 2; }
+    .header-container { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; }
+    .logo a { color: var(--text); text-decoration:none; font-weight:700; letter-spacing:.3px; display:flex; gap:10px; align-items:center; }
+    .main-nav a { color: var(--muted); margin:0 10px; text-decoration:none; }
+    .main-nav a:hover { color: var(--text); }
+
+    .screen { position: relative; display:grid; place-items:center; padding:24px; }
+    .card { width: 100%; max-width: 420px; background: var(--card); backdrop-filter: blur(12px); border-radius: 18px; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 40px rgba(0,0,0,.35); overflow:hidden; }
+    .card-header { padding: 22px 22px 8px; display:flex; align-items:center; gap:12px; }
+    .app-badge { width:40px; height:40px; display:grid; place-items:center; background: linear-gradient(135deg, var(--primary), var(--primary-2)); color:white; border-radius: 12px; box-shadow: 0 6px 18px rgba(123,58,237,.45); }
+    .card-title { font-size: 18px; font-weight: 700; }
+    .card-sub { padding: 0 22px 12px; color: var(--muted); font-size: 13px; }
+
+    .form { padding: 8px 22px 22px; }
+    .field { position: relative; margin-top: 18px; }
+    .input { width:100%; border-radius: 12px; border: 1px solid rgba(148,163,184,.35); background: rgba(255,255,255,.06); color: var(--text); padding: 20px 14px 10px; outline:none; transition: border-color .2s, background .2s, box-shadow .2s; }
+    .label { position:absolute; left: 12px; top: 14px; color: var(--muted); font-size: 13px; pointer-events:none; transform-origin:left top; transition: transform .18s ease, color .18s ease, top .18s ease; }
+    .input:focus { border-color: var(--ring); box-shadow: 0 0 0 4px rgba(167,139,250,.18); }
+    .input:not(:placeholder-shown) + .label, .input:focus + .label { transform: translateY(-9px) scale(.85); color: var(--ring); top: 6px; }
+    .actions { display:flex; align-items:center; justify-content:space-between; margin-top: 14px; }
+    .ios-switch { position:relative; width:52px; height:30px; background: rgba(255,255,255,.12); border-radius:999px; border:1px solid rgba(148,163,184,.35); cursor:pointer; transition: background .25s; display:inline-flex; align-items:center; }
+    .ios-thumb { position:absolute; left:2px; width:26px; height:26px; background:#fff; border-radius:50%; box-shadow: 0 6px 18px rgba(0,0,0,.25); transition: transform .25s cubic-bezier(.2,.8,.2,1); display:grid; place-items:center; color:#f59e0b; }
+    .ios-switch[aria-checked="true"] .ios-thumb { transform: translateX(22px) rotate(180deg); color:#0ea5e9; }
+    .link { color: var(--ring); text-decoration:none; font-size: 13px; }
+    .link:hover { text-decoration: underline; }
+    .submit { margin-top: 16px; width:100%; border:0; border-radius: 14px; background: linear-gradient(135deg, var(--primary), var(--primary-2)); color:white; padding: 14px 16px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:10px; box-shadow: 0 12px 22px rgba(124,58,237,.35); transition: transform .08s ease, box-shadow .2s ease; }
+    .submit:active { transform: translateY(1px); box-shadow: 0 8px 16px rgba(124,58,237,.25); }
+    .spinner { width:18px; height:18px; border: 2px solid rgba(255,255,255,.5); border-top-color:white; border-radius:50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .card-footer { padding: 18px 22px 22px; display:flex; align-items:center; justify-content:space-between; color: var(--muted); font-size: 13px; }
+    .back { color: var(--muted); text-decoration:none; }
+    .back:hover { color: var(--text); }
+
+    .toast { position: fixed; top: 20px; right: 24px; z-index: 9999; background: #111827; color:#fff; border:1px solid rgba(255,255,255,.1); box-shadow: 0 10px 30px rgba(0,0,0,.4); border-radius: 12px; padding: 12px 14px; min-width: 240px; display:flex; gap:10px; align-items:flex-start; opacity:0; transform: translateY(-8px); transition: opacity .2s ease, transform .2s ease; }
+    .toast.show { opacity:1; transform: translateY(0); }
+    .toast.success { background:#065f46; }
+    .toast.error { background:#7f1d1d; }
+    .toast .title { font-weight:700; font-size: 14px; }
+    .toast .msg { font-size: 13px; opacity:.95; }
+
+    @media (max-width: 480px) {
+      .card { max-width: 94vw; }
+      .header-container { padding: 14px; }
+      .main-nav { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header class="site-header">
+      <div class="header-left">
+        <button id="sidebarToggle" class="burger-menu" aria-label="Toggle Sidebar">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        <h1 class="site-title">CivicPulse</h1>
+      </div>
+      <div class="site-actions">
+        <div class="user-menu" id="userMenu" style="display:none"></div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="sun-icon">☀️</span>
+          <span class="moon-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="screen" id="main-content" role="main">
+      <section class="card" aria-labelledby="loginTitle">
+        <div class="card-header">
+          <div class="app-badge"><i class="fa-solid fa-shield-heart"></i></div>
+          <div>
+            <div class="card-title" id="loginTitle">Welcome back</div>
+          </div>
+        </div>
+        <div class="card-sub">Sign in with your Special ID or email and password</div>
+
+        <form id="loginForm" class="form" novalidate>
+          <div class="field form-group">
+            <input id="usernameOrEmail" name="usernameOrEmail" class="input form-input" type="text" inputmode="email" autocomplete="username" placeholder=" " aria-required="true" required />
+            <label class="label form-label" for="usernameOrEmail">Special ID or Email</label>
+            <div class="form-error" id="login-username-error" style="display:none"></div>
+          </div>
+          <div class="field form-group">
+            <input id="password" name="password" class="input form-input" type="password" autocomplete="current-password" placeholder=" " aria-required="true" required />
+            <label class="label form-label" for="password">Password</label>
+            <div class="form-error" id="login-password-error" style="display:none"></div>
+          </div>
+          <div class="actions">
+            <button type="button" id="rememberToggle" class="ios-switch" role="switch" aria-checked="false" aria-label="Remember me">
+              <span class="ios-thumb"><i class="fa-solid fa-moon"></i></span>
+            </button>
+            <a href="#" class="link" id="forgotIdLink" aria-label="Forgot Special ID">Forgot Special ID?</a>
+          </div>
+          <button class="submit btn btn-primary btn-lg" id="submitBtn" type="submit">
+            <span class="btn-label">Sign in</span>
+          </button>
+        </form>
+
+        <div class="card-footer">
+          <span>New here? <a class="link" href="register.html">Create an account</a></span>
+          <a class="back" href="../index.html"><i class="fa-solid fa-arrow-left"></i> Home</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links" style="display:flex;gap:16px;justify-content:center;padding:16px 0;">
+        <a href="../pages/about.html">About</a>
+        <a href="../pages/contact.html">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" style="display:none;">
+    <div style="margin-top:2px"><i id="toastIcon" class="fa-solid fa-circle-info"></i></div>
+    <div>
+      <div class="title" id="toastTitle">Notice</div>
+      <div class="msg" id="toastMsg">Message</div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const themeToggle = document.getElementById('themeToggle');
+      const rememberToggle = document.getElementById('rememberToggle');
+      const form = document.getElementById('loginForm');
+      const submitBtn = document.getElementById('submitBtn');
+      const btnLabel = submitBtn.querySelector('.btn-label');
+      const toast = document.getElementById('toast');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+
+      // Persisted theme
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        themeToggle.setAttribute('aria-checked', 'true');
+      } else if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+        themeToggle.setAttribute('aria-checked', 'false');
+      }
+      themeToggle.addEventListener('click', () => {
+        const isOn = themeToggle.getAttribute('aria-checked') === 'true';
+        const next = !isOn;
+        themeToggle.setAttribute('aria-checked', String(next));
+        if (next) {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        }
+      });
+
+      rememberToggle.addEventListener('click', () => {
+        const isOn = rememberToggle.getAttribute('aria-checked') === 'true';
+        rememberToggle.setAttribute('aria-checked', String(!isOn));
+      });
+
+      function showToast(title, message, type = 'info') {
+        toastTitle.textContent = title;
+        toastMsg.textContent = message;
+        toast.classList.remove('success', 'error');
+        toast.classList.add(type);
+        toast.style.display = 'flex';
+        requestAnimationFrame(() => toast.classList.add('show'));
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => (toast.style.display = 'none'), 200);
+        }, 3000);
+      }
+
+      function setLoading(loading) {
+        submitBtn.disabled = loading;
+        if (loading) {
+          btnLabel.innerHTML = '<span class="spinner" aria-hidden="true"></span> Signing in...';
+        } else {
+          btnLabel.textContent = 'Sign in';
+        }
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const usernameOrEmail = document.getElementById('usernameOrEmail').value.trim();
+        const password = document.getElementById('password').value;
+        const remember = rememberToggle.getAttribute('aria-checked') === 'true';
+        if (!usernameOrEmail || !password) {
+          showToast('Missing fields', 'Please enter your credentials.', 'error');
+          return;
+        }
+        setLoading(true);
+        try {
+          const res = await fetch('/untitled_folder-main/api/auth/login.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usernameOrEmail, password, remember })
+          });
+          const data = await res.json().catch(() => ({ ok:false, error:'Invalid server response' }));
+          if (!res.ok || !data.ok) {
+            showToast('Login failed', data.error || 'Invalid credentials', 'error');
+            setLoading(false);
+            return;
+          }
+          showToast('Welcome', 'Signed in successfully', 'success');
+          const redirect = data.redirect || '../index.html';
+          setTimeout(() => { window.location.href = redirect; }, 600);
+        } catch (err) {
+          showToast('Network error', 'Please check your connection and try again.', 'error');
+          setLoading(false);
+        }
+      });
+
+      document.getElementById('forgotIdLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        showToast('Coming soon', 'Special ID recovery will be available shortly.', 'info');
+      });
+
+      // Keyboard support for switches
+      [themeToggle, rememberToggle].forEach(el => {
+        el.tabIndex = 0;
+        el.addEventListener('keydown', (ev) => {
+          if (ev.key === ' ' || ev.key === 'Enter') { ev.preventDefault(); el.click(); }
+        });
+      });
+    })();
+  </script>
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

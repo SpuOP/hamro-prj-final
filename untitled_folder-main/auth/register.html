@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join CivicPulse - Community Registration</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Registration Form Specific Styles */
+    .registration-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      padding: var(--space-8) var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .registration-card {
+      background: var(--card-bg-glass);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border: var(--glass-border);
+      border-radius: var(--radius-3xl);
+      box-shadow: var(--shadow-2xl);
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+      animation: slideInUp 0.8s ease-out;
+    }
+
+    .registration-header {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+      padding: var(--space-8);
+      text-align: center;
+      color: white;
+    }
+
+    .registration-header h1 {
+      color: white;
+      margin-bottom: var(--space-2);
+      font-size: 2rem;
+    }
+
+    .registration-header p {
+      color: rgba(255, 255, 255, 0.9);
+      margin: 0;
+    }
+
+    .progress-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--space-6) var(--space-8);
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+      position: relative;
+      flex: 1;
+    }
+
+    .progress-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      width: 100%;
+      height: 2px;
+      background: var(--border-color);
+      z-index: 1;
+    }
+
+    .progress-step.active:not(:last-child)::after {
+      background: var(--accent-color);
+    }
+
+    .progress-step.completed:not(:last-child)::after {
+      background: var(--success);
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: 2px solid var(--border-color);
+      transition: all var(--transition-normal);
+      z-index: 2;
+    }
+
+    .progress-step.active .step-number {
+      background: var(--accent-color);
+      color: white;
+      border-color: var(--accent-color);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .progress-step.completed .step-number {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    .step-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .progress-step.active .step-label {
+      color: var(--accent-color);
+      font-weight: 600;
+    }
+
+    .progress-step.completed .step-label {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .form-container {
+      padding: var(--space-8);
+    }
+
+    .form-step {
+      display: none;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .form-step.active {
+      display: block;
+    }
+
+    .form-step h3 {
+      color: var(--text-primary);
+      margin-bottom: var(--space-6);
+      text-align: center;
+      font-size: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: var(--space-6);
+    }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-3);
+      font-size: 0.875rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: var(--space-4);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all var(--transition-normal);
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-control.is-invalid {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+    }
+
+    .form-control.is-valid {
+      border-color: var(--success);
+      box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+
+    .file-upload-area {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      text-align: center;
+      background: var(--bg-secondary);
+      transition: all var(--transition-normal);
+      cursor: pointer;
+    }
+
+    .file-upload-area:hover {
+      border-color: var(--accent-color);
+      background: var(--accent-light);
+    }
+
+    .file-upload-area.dragover {
+      border-color: var(--accent-color);
+      background: var(--accent-light);
+      transform: scale(1.02);
+    }
+
+    .file-upload-icon {
+      font-size: 3rem;
+      color: var(--accent-color);
+      margin-bottom: var(--space-4);
+    }
+
+    .file-preview {
+      margin-top: var(--space-4);
+      padding: var(--space-4);
+      background: var(--bg-primary);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+    }
+
+    .file-preview img {
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--radius-md);
+    }
+
+    .form-actions {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: space-between;
+      margin-top: var(--space-8);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    .terms-checkbox {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+
+    .terms-checkbox input[type="checkbox"] {
+      margin-top: 2px;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent-color);
+    }
+
+    .terms-checkbox label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .terms-checkbox a {
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+
+    .terms-checkbox a:hover {
+      text-decoration: underline;
+    }
+
+    .success-message {
+      text-align: center;
+      padding: var(--space-8);
+    }
+
+    .success-icon {
+      font-size: 4rem;
+      color: var(--success);
+      margin-bottom: var(--space-4);
+      animation: bounceIn 0.8s ease-out;
+    }
+
+    .success-message h3 {
+      color: var(--text-primary);
+      margin-bottom: var(--space-4);
+    }
+
+    .success-message p {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-6);
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+      70% {
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .registration-card {
+        margin: var(--space-4);
+        border-radius: var(--radius-2xl);
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .progress-bar {
+        padding: var(--space-4);
+      }
+
+      .step-label {
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <button id="sidebarToggle" class="burger-menu" aria-label="Toggle Sidebar">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+      <h1 class="site-title">CivicPulse</h1>
+    </div>
+    <div class="site-actions">
+      <div class="user-menu" id="userMenu" style="display:none"></div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="sun-icon">☀️</span>
+        <span class="moon-icon">🌙</span>
+      </button>
+    </div>
+  </header>
+  <div class="registration-container">
+    <div class="registration-card">
+      <!-- Header -->
+      <div class="registration-header">
+        <h1><i class="fas fa-vote-yea"></i> Join CivicPulse</h1>
+        <p>Become part of your community's democratic voice</p>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-bar">
+        <div class="progress-step active" data-step="1">
+          <div class="step-number">1</div>
+          <div class="step-label">Basic Info</div>
+        </div>
+        <div class="progress-step" data-step="2">
+          <div class="step-number">2</div>
+          <div class="step-label">Documents</div>
+        </div>
+        <div class="progress-step" data-step="3">
+          <div class="step-number">3</div>
+          <div class="step-label">Review</div>
+        </div>
+      </div>
+
+      <!-- Form Container -->
+      <div class="form-container">
+        <form id="registrationForm" enctype="multipart/form-data">
+          <input type="hidden" id="csrf_token" name="csrf_token" />
+          <!-- Step 1: Basic Information -->
+          <div class="form-step active" data-step="1">
+            <h3>Tell us about yourself</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="firstName">First Name *</label>
+                <input type="text" id="firstName" name="firstName" class="form-input" required>
+                <div class="form-error" id="firstName-error" style="display:none"></div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="lastName">Last Name *</label>
+                <input type="text" id="lastName" name="lastName" class="form-input" required>
+                <div class="form-error" id="lastName-error" style="display:none"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">Email Address *</label>
+              <input type="email" id="email" name="email" class="form-input" required>
+              <div class="form-error" id="email-error" style="display:none"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone Number *</label>
+              <input type="tel" id="phone" name="phone" class="form-input" required>
+              <div class="form-error" id="phone-error" style="display:none"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="city">City *</label>
+              <select id="city" name="city" class="form-select" required>
+                <option value="">Select your city</option>
+                <option value="new-york">New York</option>
+                <option value="los-angeles">Los Angeles</option>
+                <option value="chicago">Chicago</option>
+                <option value="houston">Houston</option>
+                <option value="phoenix">Phoenix</option>
+                <option value="philadelphia">Philadelphia</option>
+                <option value="san-antonio">San Antonio</option>
+                <option value="san-diego">San Diego</option>
+                <option value="dallas">Dallas</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <div></div>
+              <button type="button" class="btn btn-primary" onclick="nextStep()">
+                Next Step <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Document Upload -->
+          <div class="form-step" data-step="2">
+            <h3>Verify your identity</h3>
+            
+            <div class="form-group">
+              <label class="form-label">Government ID or Driver's License *</label>
+              <div class="file-upload-area" id="fileUploadArea">
+                <div class="file-upload-icon">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <p><strong>Click to upload</strong> or drag and drop</p>
+                <p class="text-muted">PNG, JPG, PDF up to 10MB</p>
+                <input type="file" id="idDocument" name="idDocument" accept=".jpg,.jpeg,.png,.pdf" style="display: none;" required>
+              </div>
+              <div class="file-preview" id="filePreview" style="display: none;"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="address">Residential Address *</label>
+              <textarea id="address" name="address" class="form-textarea" rows="3" placeholder="Enter your full residential address" required></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-outline" onclick="prevStep()">
+                <i class="fas fa-arrow-left"></i> Previous
+              </button>
+              <button type="button" class="btn btn-primary" onclick="nextStep()">
+                Next Step <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Review and Submit -->
+          <div class="form-step" data-step="3">
+            <h3>Review and submit</h3>
+            
+            <div class="form-group">
+              <div class="terms-checkbox">
+                <input type="checkbox" id="termsAccepted" name="termsAccepted" required>
+                <label for="termsAccepted">
+                  I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>. 
+                  I confirm that all information provided is accurate and I am a resident of the city I selected.
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="terms-checkbox">
+                <input type="checkbox" id="communityGuidelines" name="communityGuidelines" required>
+                <label for="communityGuidelines">
+                  I agree to follow the <a href="#" target="_blank">Community Guidelines</a> and contribute positively to civic discussions.
+                </label>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-outline" onclick="prevStep()">
+                <i class="fas fa-arrow-left"></i> Previous
+              </button>
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Submit Application
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Success Message -->
+        <div class="success-message" id="successMessage" style="display: none;">
+          <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h3>Application Submitted Successfully!</h3>
+          <p>Thank you for joining CivicPulse! Your application is now under review by our community administrators. You will receive an email with your Special Login ID (CIP-ID) within 24-48 hours.</p>
+          <div class="form-actions">
+            <a href="../index.html" class="btn btn-primary">
+              <i class="fas fa-home"></i> Return to Homepage
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links" style="display:flex;gap:16px;justify-content:center;padding:16px 0;">
+        <a href="../pages/about.html">About</a>
+        <a href="../pages/contact.html">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/theme.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script>
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    // Fetch CSRF token
+    fetch('../api/security/csrf.php', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { const f = document.getElementById('csrf_token'); if (f && d && d.csrf_token) f.value = d.csrf_token; })
+      .catch(() => {});
+
+    // File upload handling
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('idDocument');
+    const filePreview = document.getElementById('filePreview');
+
+    fileUploadArea.addEventListener('click', () => fileInput.click());
+    
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    fileUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileUploadArea.classList.add('dragover');
+    });
+    
+    fileUploadArea.addEventListener('dragleave', () => {
+      fileUploadArea.classList.remove('dragover');
+    });
+    
+    fileUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileUploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        handleFileSelect();
+      }
+    });
+
+    function handleFileSelect() {
+      const file = fileInput.files[0];
+      if (file) {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            filePreview.innerHTML = `<img src="${e.target.result}" alt="Document Preview">`;
+            filePreview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        } else {
+          filePreview.innerHTML = `<p><i class="fas fa-file"></i> ${file.name}</p>`;
+          filePreview.style.display = 'block';
+        }
+      }
+    }
+
+    function nextStep() {
+      if (!validateCurrentStep()) return;
+      if (currentStep === 1) {
+        // basic info validation already covered by required attributes
+      }
+      if (currentStep === 2) {
+        // ensure file chosen
+        if (!fileInput.files || fileInput.files.length === 0) {
+          alert('Please upload your ID document.');
+          return;
+        }
+      }
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateProgress();
+        showStep(currentStep);
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateProgress();
+        showStep(currentStep);
+      }
+    }
+
+    function showStep(step) {
+      document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+      document.querySelector(`[data-step="${step}"]`).classList.add('active');
+    }
+
+    function updateProgress() {
+      document.querySelectorAll('.progress-step').forEach((step, index) => {
+        const stepNum = index + 1;
+        step.classList.remove('active', 'completed');
+        
+        if (stepNum < currentStep) {
+          step.classList.add('completed');
+        } else if (stepNum === currentStep) {
+          step.classList.add('active');
+        }
+      });
+    }
+
+    function validateCurrentStep() {
+      const currentStepElement = document.querySelector(`[data-step="${currentStep}"]`);
+      const requiredFields = currentStepElement.querySelectorAll('[required]');
+      let isValid = true;
+
+      requiredFields.forEach(field => {
+        const value = (field.type === 'checkbox') ? (field.checked ? '1' : '') : field.value;
+        if (!value || !value.toString().trim()) {
+          field.classList.add('is-invalid');
+          isValid = false;
+        } else {
+          field.classList.remove('is-invalid');
+          field.classList.add('is-valid');
+        }
+      });
+
+      return isValid;
+    }
+
+    // Form submission
+    document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!validateCurrentStep()) {
+        return;
+      }
+
+      const submitBtn = document.getElementById('submitBtn');
+      const originalText = submitBtn.innerHTML;
+      
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+      submitBtn.disabled = true;
+
+      try {
+        const formData = new FormData(e.target);
+        // CSRF token if available in session
+        const csrf = sessionStorage.getItem('csrf');
+        if (csrf) formData.append('csrf_token', csrf);
+        const response = await fetch('../api/auth/register.php', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          document.getElementById('successMessage').style.display = 'block';
+          document.getElementById('registrationForm').style.display = 'none';
+        } else {
+          alert('Registration failed: ' + (result.message || 'Unknown error'));
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Registration failed. Please try again.');
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Real-time validation
+    document.querySelectorAll('.form-control').forEach(field => {
+      field.addEventListener('blur', () => {
+        const value = (field.type === 'checkbox') ? (field.checked ? '1' : '') : field.value;
+        if (field.hasAttribute('required') && !value.toString().trim()) {
+          field.classList.add('is-invalid');
+        } else if (field.value.trim()) {
+          field.classList.remove('is-invalid');
+          field.classList.add('is-valid');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

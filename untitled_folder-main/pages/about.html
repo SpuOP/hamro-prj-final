@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - CivicPulse Community Voting Platform</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="site-header">
+      <div class="header-left">
+        <button id="sidebarToggle" class="burger-menu" aria-label="Toggle Sidebar">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        <h1 class="site-title">CivicPulse</h1>
+      </div>
+      <div class="site-actions">
+        <div class="user-menu" id="userMenu" style="display:none"></div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="sun-icon">☀️</span>
+          <span class="moon-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Primary Navigation">
+      <nav class="sidebar-nav">
+        <a class="nav-item" href="../index.html">
+          <span class="nav-icon"><i class="fas fa-home"></i></span>
+          <span class="nav-label">Home</span>
+        </a>
+        
+        <div id="loggedInNav" style="display: none;">
+          <a class="nav-item" href="../issues/create.html">
+            <span class="nav-icon"><i class="fas fa-plus-circle"></i></span>
+            <span class="nav-label">Post Issue</span>
+          </a>
+          <a class="nav-item" href="contact.html">
+            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+            <span class="nav-label">Contact</span>
+          </a>
+          <a class="nav-item active" href="about.html">
+            <span class="nav-icon"><i class="fas fa-info-circle"></i></span>
+            <span class="nav-label">About Us</span>
+          </a>
+          
+          <div id="adminNav" style="display: none;">
+            <div class="nav-divider"></div>
+            <div class="nav-section-title">Admin</div>
+            <a class="nav-item" href="../admin/dashboard.html">
+              <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+              <span class="nav-label">Dashboard</span>
+            </a>
+            <a class="nav-item" href="../admin/users.html">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span class="nav-label">User Management</span>
+            </a>
+            <a class="nav-item" href="../admin/moderation.html">
+              <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
+              <span class="nav-label">Moderation</span>
+            </a>
+            <a class="nav-item" href="../admin/settings.html">
+              <span class="nav-icon"><i class="fas fa-cog"></i></span>
+              <span class="nav-label">Settings</span>
+            </a>
+          </div>
+          
+          <div class="nav-divider"></div>
+          <a class="nav-item" href="../auth/logout.html">
+            <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+            <span class="nav-label">Logout</span>
+          </a>
+        </div>
+        
+        <div id="loggedOutNav">
+          <a class="nav-item" href="../auth/register.html">
+            <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
+            <span class="nav-label">Register</span>
+          </a>
+          <a class="nav-item" href="../auth/login.html">
+            <span class="nav-icon"><i class="fas fa-sign-in-alt"></i></span>
+            <span class="nav-label">Login</span>
+          </a>
+          <a class="nav-item" href="contact.html">
+            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+            <span class="nav-label">Contact</span>
+          </a>
+          <a class="nav-item active" href="about.html">
+            <span class="nav-icon"><i class="fas fa-info-circle"></i></span>
+            <span class="nav-label">About Us</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="main-content">
+      <!-- About Us Section -->
+      <section class="about-section">
+        <div class="container">
+          <div class="about-header">
+            <h1>About CivicPulse</h1>
+            <p class="lead">Empowering communities through democratic participation and local issue resolution</p>
+          </div>
+
+          <div class="about-content">
+            <!-- Mission Section -->
+            <div class="about-card">
+              <div class="card-icon">
+                <i class="fas fa-bullseye"></i>
+              </div>
+              <h2>Our Mission</h2>
+              <p>CivicPulse is a community voting platform that connects citizens with their local government through transparent democratic participation. We believe that every voice matters and that collective action can solve local problems effectively.</p>
+              <p>Our platform enables citizens to report community issues, vote on priorities, and engage directly with local representatives to create stronger, more responsive neighborhoods.</p>
+            </div>
+
+            <!-- How It Works Section -->
+            <div class="about-card">
+              <div class="card-icon">
+                <i class="fas fa-cogs"></i>
+              </div>
+              <h2>How It Works</h2>
+              <div class="process-steps">
+                <div class="step">
+                  <div class="step-number">1</div>
+                  <div class="step-content">
+                    <h3>Citizen Registration</h3>
+                    <p>Citizens register with verified identity documents to ensure authentic community participation and prevent abuse.</p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number">2</div>
+                  <div class="step-content">
+                    <h3>Admin Approval</h3>
+                    <p>Our team reviews applications to maintain platform integrity and ensure only genuine community members participate.</p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number">3</div>
+                  <div class="step-content">
+                    <h3>Location-Based Access</h3>
+                    <p>Approved citizens access location-based dashboards showing relevant local issues in their community.</p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number">4</div>
+                  <div class="step-content">
+                    <h3>Democratic Voting</h3>
+                    <p>Citizens vote on community issues, helping prioritize problems that need immediate attention.</p>
+                  </div>
+                </div>
+                <div class="step">
+                  <div class="step-number">5</div>
+                  <div class="step-content">
+                    <h3>Direct Engagement</h3>
+                    <p>Top-voted issues are escalated to local authorities for action and resolution.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Platform Values Section -->
+            <div class="about-card">
+              <div class="card-icon">
+                <i class="fas fa-heart"></i>
+              </div>
+              <h2>Our Values</h2>
+              <div class="values-grid">
+                <div class="value-item">
+                  <i class="fas fa-eye"></i>
+                  <h3>Transparency</h3>
+                  <p>All community issues and voting results are publicly visible to ensure accountability in local governance.</p>
+                </div>
+                <div class="value-item">
+                  <i class="fas fa-vote-yea"></i>
+                  <h3>Democratic Participation</h3>
+                  <p>Every citizen has an equal voice in community decision-making through our fair voting system.</p>
+                </div>
+                <div class="value-item">
+                  <i class="fas fa-balance-scale"></i>
+                  <h3>Accountability</h3>
+                  <p>We track issue resolution progress and hold local authorities accountable for addressing community concerns.</p>
+                </div>
+                <div class="value-item">
+                  <i class="fas fa-users"></i>
+                  <h3>Inclusive Engagement</h3>
+                  <p>We welcome all community members regardless of background, ensuring diverse perspectives are represented.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Community Impact Section -->
+            <div class="about-card">
+              <div class="card-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <h2>Community Impact</h2>
+              <div class="impact-stats">
+                <div class="stat-item">
+                  <div class="stat-number">1,000+</div>
+                  <div class="stat-label">Active Citizens</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">500+</div>
+                  <div class="stat-label">Issues Resolved</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">50+</div>
+                  <div class="stat-label">Communities Served</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">95%</div>
+                  <div class="stat-label">Satisfaction Rate</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="about-card cta-card">
+              <h2>Join Your Community</h2>
+              <p>Ready to make a difference in your neighborhood? Register today and start participating in local democratic decision-making.</p>
+              <div class="cta-buttons">
+                <a href="../auth/register.html" class="btn btn-primary btn-lg">
+                  <i class="fas fa-user-plus"></i> Register Now
+                </a>
+                <a href="contact.html" class="btn btn-secondary btn-lg">
+                  <i class="fas fa-envelope"></i> Contact Us
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links" style="display:flex;gap:16px;justify-content:center;padding:16px 0;">
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/theme.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>

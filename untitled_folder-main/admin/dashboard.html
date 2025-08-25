@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - CivicPulse</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Admin Dashboard Specific Styles */
+    .admin-container {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      padding: var(--space-6);
+    }
+
+    .admin-header {
+      background: var(--card-bg-glass);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border: var(--glass-border);
+      border-radius: var(--radius-3xl);
+      padding: var(--space-8);
+      margin-bottom: var(--space-8);
+      box-shadow: var(--shadow-xl);
+      text-align: center;
+    }
+
+    .admin-header h1 {
+      color: var(--text-primary);
+      margin-bottom: var(--space-4);
+      font-size: 2.5rem;
+    }
+
+    .admin-header p {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      margin: 0;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .stat-card {
+      background: var(--card-bg-glass);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border: var(--glass-border);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-6);
+      text-align: center;
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--accent-light), transparent);
+      opacity: 0;
+      transition: opacity var(--transition-normal);
+    }
+
+    .stat-card:hover::before {
+      opacity: 0.05;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .stat-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-4);
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .stat-card.pending .stat-icon {
+      background: linear-gradient(135deg, var(--warning), var(--warning-dark));
+    }
+
+    .stat-card.approved .stat-icon {
+      background: linear-gradient(135deg, var(--success), var(--success-dark));
+    }
+
+    .stat-card.rejected .stat-icon {
+      background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+    }
+
+    .stat-card.total .stat-icon {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--space-2);
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .action-card {
+      background: var(--card-bg-glass);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border: var(--glass-border);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-6);
+      transition: all var(--transition-normal);
+      text-align: center;
+    }
+
+    .action-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--accent-color);
+    }
+
+    .action-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-4);
+      font-size: 2rem;
+      color: white;
+      transition: all var(--transition-normal);
+    }
+
+    .action-card:hover .action-icon {
+      transform: scale(1.1);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .action-title {
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: var(--space-3);
+    }
+
+    .action-description {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-4);
+      line-height: 1.6;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-admin {
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-xl);
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      transition: all var(--transition-normal);
+    }
+
+    .btn-admin:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .recent-activity {
+      background: var(--card-bg-glass);
+      backdrop-filter: var(--backdrop-blur);
+      -webkit-backdrop-filter: var(--backdrop-blur);
+      border: var(--glass-border);
+      border-radius: var(--radius-3xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .recent-activity h3 {
+      color: var(--text-primary);
+      margin-bottom: var(--space-6);
+      font-size: 1.5rem;
+      text-align: center;
+    }
+
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      transition: all var(--transition-normal);
+    }
+
+    .activity-item:hover {
+      background: var(--bg-tertiary);
+      transform: translateX(5px);
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      color: white;
+    }
+
+    .activity-icon.new {
+      background: var(--accent-color);
+    }
+
+    .activity-icon.approved {
+      background: var(--success);
+    }
+
+    .activity-icon.rejected {
+      background: var(--danger);
+    }
+
+    .activity-content {
+      flex: 1;
+    }
+
+    .activity-title {
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-bottom: var(--space-1);
+    }
+
+    .activity-time {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+      border-radius: var(--radius-2xl);
+      padding: var(--space-8);
+      margin-bottom: var(--space-8);
+      color: white;
+      text-align: center;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .welcome-banner h2 {
+      color: white;
+      margin-bottom: var(--space-4);
+      font-size: 2rem;
+    }
+
+    .welcome-banner p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.125rem;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .admin-container {
+        padding: var(--space-4);
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-4);
+      }
+
+      .actions-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-actions {
+        flex-direction: column;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+      }
+
+      .admin-header h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-left">
+      <button id="sidebarToggle" class="burger-menu" aria-label="Toggle Sidebar">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+      <h1 class="site-title">CivicPulse</h1>
+    </div>
+    <div class="site-actions">
+      <div class="user-menu" id="userMenu" style="display:none"></div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="sun-icon">☀️</span>
+        <span class="moon-icon">🌙</span>
+      </button>
+    </div>
+  </header>
+  <div class="admin-container">
+    <div id="loadingOverlay" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.35);backdrop-filter:blur(4px);z-index:9999;">
+      <div style="background:var(--card-bg-glass);border:var(--glass-border);padding:18px 20px;border-radius:16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-xl);">
+        <div style="width:18px;height:18px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite"></div>
+        <span>Loading dashboard…</span>
+      </div>
+    </div>
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+      <h2><i class="fas fa-shield-alt"></i> Welcome to CivicPulse Admin</h2>
+      <p>Manage community applications and monitor platform activity</p>
+    </div>
+
+    <!-- Admin Header -->
+    <div class="admin-header">
+      <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+      <p>Monitor and manage your community platform</p>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="stats-grid">
+      <div class="stat-card pending">
+        <div class="stat-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-number" id="pendingCount">0</div>
+        <div class="stat-label">Pending Applications</div>
+      </div>
+
+      <div class="stat-card approved">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-number" id="approvedCount">0</div>
+        <div class="stat-label">Approved Today</div>
+      </div>
+
+      <div class="stat-card rejected">
+        <div class="stat-icon">
+          <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="stat-number" id="rejectedCount">0</div>
+        <div class="stat-label">Rejected Today</div>
+      </div>
+
+      <div class="stat-card total">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-number" id="totalUsers">0</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-grid">
+      <div class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <h3 class="action-title">Review Applications</h3>
+        <p class="action-description">Review and approve/reject pending community applications</p>
+        <div class="quick-actions">
+          <a href="pending-users.php" class="btn btn-primary btn-admin">
+            <i class="fas fa-eye"></i> View Pending
+          </a>
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-users-cog"></i>
+        </div>
+        <h3 class="action-title">User Management</h3>
+        <p class="action-description">Manage existing users, view profiles, and handle issues</p>
+        <div class="quick-actions">
+          <a href="users.php" class="btn btn-secondary btn-admin">
+            <i class="fas fa-users"></i> Manage Users
+          </a>
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h3 class="action-title">Analytics</h3>
+        <p class="action-description">View platform statistics and community engagement metrics</p>
+        <div class="quick-actions">
+          <a href="analytics.php" class="btn btn-secondary btn-admin">
+            <i class="fas fa-chart-bar"></i> View Analytics
+          </a>
+        </div>
+      </div>
+
+      <div class="action-card">
+        <div class="action-icon">
+          <i class="fas fa-cog"></i>
+        </div>
+        <h3 class="action-title">Settings</h3>
+        <p class="action-description">Configure platform settings and manage admin accounts</p>
+        <div class="quick-actions">
+          <a href="settings.php" class="btn btn-secondary btn-admin">
+            <i class="fas fa-wrench"></i> Configure
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-activity">
+      <h3><i class="fas fa-history"></i> Recent Activity</h3>
+      <div class="activity-list" id="activityList">
+        <!-- Activity items will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links" style="display:flex;gap:16px;justify-content:center;padding:16px 0;">
+        <a href="../pages/about.html">About</a>
+        <a href="../pages/contact.html">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/admin.js"></script>
+  <script>
+    const AUTH_STATUS_URL = '/untitled_folder-main/api/admin/auth/status.php';
+    const LOGIN_REDIRECT = '/untitled_folder-main/auth/login.html';
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    function setOverlay(visible) {
+      loadingOverlay.style.display = visible ? 'flex' : 'none';
+    }
+
+    async function requireAdminAuth() {
+      try {
+        setOverlay(true);
+        const res = await fetch(AUTH_STATUS_URL, { credentials: 'include' });
+        if (res.status === 401) {
+          window.location.href = LOGIN_REDIRECT;
+          return false;
+        }
+        const data = await res.json();
+        if (!data || !data.authenticated) {
+          window.location.href = LOGIN_REDIRECT;
+          return false;
+        }
+        return true;
+      } catch (e) {
+        console.error('Auth status error', e);
+        window.location.href = LOGIN_REDIRECT;
+        return false;
+      } finally {
+        setOverlay(false);
+      }
+    }
+
+    // Load dashboard data
+    async function loadDashboardData() {
+      try {
+        const response = await fetch('../api/admin/stats.php');
+        const data = await response.json();
+        
+        if (data.success) {
+          document.getElementById('pendingCount').textContent = data.stats.pending || 0;
+          document.getElementById('approvedCount').textContent = data.stats.approved_today || 0;
+          document.getElementById('rejectedCount').textContent = data.stats.rejected_today || 0;
+          document.getElementById('totalUsers').textContent = data.stats.total_users || 0;
+        } else {
+          console.warn('Stats error', data);
+        }
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+
+    // Load recent activity
+    async function loadRecentActivity() {
+      try {
+        const response = await fetch('../api/admin/activity.php');
+        const data = await response.json();
+        
+        if (data.success) {
+          const activityList = document.getElementById('activityList');
+          activityList.innerHTML = '';
+          
+          data.activities.forEach(activity => {
+            const activityItem = document.createElement('div');
+            activityItem.className = 'activity-item';
+            
+            let iconClass = 'fas fa-info-circle';
+            let iconBg = 'new';
+            
+            if (activity.type === 'application_approved') {
+              iconClass = 'fas fa-check-circle';
+              iconBg = 'approved';
+            } else if (activity.type === 'application_rejected') {
+              iconClass = 'fas fa-times-circle';
+              iconBg = 'rejected';
+            }
+            
+            activityItem.innerHTML = `
+              <div class="activity-icon ${iconBg}">
+                <i class="${iconClass}"></i>
+              </div>
+              <div class="activity-content">
+                <div class="activity-title">${activity.title}</div>
+                <div class="activity-time">${formatTimeAgo(activity.created_at)}</div>
+              </div>
+            `;
+            
+            activityList.appendChild(activityItem);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading recent activity:', error);
+      }
+    }
+
+    function formatTimeAgo(timestamp) {
+      const now = new Date();
+      const time = new Date(timestamp);
+      const diffMs = now - time;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+      
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins} minutes ago`;
+      if (diffHours < 24) return `${diffHours} hours ago`;
+      if (diffDays < 7) return `${diffDays} days ago`;
+      return time.toLocaleDateString();
+    }
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', async () => {
+      const ok = await requireAdminAuth();
+      if (!ok) return;
+      loadDashboardData();
+      loadRecentActivity();
+
+      // Refresh data every 30 seconds
+      setInterval(() => {
+        loadDashboardData();
+        loadRecentActivity();
+      }, 30000);
+    });
+
+    // Spinner keyframes for overlay
+    const style = document.createElement('style');
+    style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

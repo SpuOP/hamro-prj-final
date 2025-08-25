@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicPulse - Community Voice Platform</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="site-header">
+      <div class="header-left">
+        <button id="sidebarToggle" class="burger-menu" aria-label="Toggle Sidebar">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+        <h1 class="site-title">CivicPulse</h1>
+      </div>
+      <div class="site-actions">
+        <div class="user-menu" id="userMenu" style="display:none"></div>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <span class="sun-icon">☀️</span>
+          <span class="moon-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Primary Navigation">
+      <nav class="sidebar-nav">
+        <a class="nav-item active" href="index.html">
+          <span class="nav-icon"><i class="fas fa-home"></i></span>
+          <span class="nav-label">Home</span>
+        </a>
+        
+        <div id="loggedInNav" style="display: none;">
+          <a class="nav-item" href="issues/create.html">
+            <span class="nav-icon"><i class="fas fa-plus-circle"></i></span>
+            <span class="nav-label">Post Issue</span>
+          </a>
+          <a class="nav-item" href="pages/contact.html">
+            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+            <span class="nav-label">Contact</span>
+          </a>
+          <a class="nav-item" href="pages/about.html">
+            <span class="nav-icon"><i class="fas fa-info-circle"></i></span>
+            <span class="nav-label">About Us</span>
+          </a>
+          
+          <div id="adminNav" style="display: none;">
+            <div class="nav-divider"></div>
+            <div class="nav-section-title">Admin</div>
+            <a class="nav-item" href="admin/dashboard.html">
+              <span class="nav-icon"><i class="fas fa-tachometer-alt"></i></span>
+              <span class="nav-label">Dashboard</span>
+            </a>
+            <a class="nav-item" href="admin/users.html">
+              <span class="nav-icon"><i class="fas fa-users"></i></span>
+              <span class="nav-label">User Management</span>
+            </a>
+            <a class="nav-item" href="admin/moderation.html">
+              <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
+              <span class="nav-label">Moderation</span>
+            </a>
+            <a class="nav-item" href="admin/settings.html">
+              <span class="nav-icon"><i class="fas fa-cog"></i></span>
+              <span class="nav-label">Settings</span>
+            </a>
+          </div>
+          
+          <div class="nav-divider"></div>
+          <a class="nav-item" href="auth/logout.html">
+            <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+            <span class="nav-label">Logout</span>
+          </a>
+        </div>
+        
+        <div id="loggedOutNav">
+          <a class="nav-item" href="auth/register.html">
+            <span class="nav-icon"><i class="fas fa-user-plus"></i></span>
+            <span class="nav-label">Register</span>
+          </a>
+          <a class="nav-item" href="auth/login.html">
+            <span class="nav-icon"><i class="fas fa-sign-in-alt"></i></span>
+            <span class="nav-label">Login</span>
+          </a>
+          <a class="nav-item" href="pages/contact.html">
+            <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+            <span class="nav-label">Contact</span>
+          </a>
+          <a class="nav-item" href="pages/about.html">
+            <span class="nav-icon"><i class="fas fa-info-circle"></i></span>
+            <span class="nav-label">About Us</span>
+          </a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="main-content">
+      <!-- Hero Section -->
+      <section class="hero">
+        <div class="hero-content">
+          <h1>Community Voice — Democratic Participation</h1>
+          <p>Report local issues, vote on community priorities, and work together for better neighborhoods.</p>
+          <div class="hero-actions">
+            <div id="loggedInActions" style="display: none;">
+              <a href="issues/create.html" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Post New Issue
+              </a>
+            </div>
+            <div id="loggedOutActions">
+              <a href="auth/register.html" class="btn btn-primary btn-lg">
+                <i class="fas fa-user-plus"></i> Join Community
+              </a>
+              <a href="auth/login.html" class="btn btn-secondary btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Content Area -->
+      <div id="mainContent">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+          <div class="loading-spinner"></div>
+          <p>Loading community issues...</p>
+        </div>
+
+        <!-- Issues Section (for logged in users) -->
+        <div id="issuesSection" style="display: none;">
+          <!-- Sorting and Stats -->
+          <div class="sorting-section">
+            <div class="sorting-controls">
+              <div class="sort-buttons">
+                <button class="btn btn-primary sort-btn" data-sort="popular">
+                  <i class="fas fa-fire"></i> Most Popular
+                </button>
+                <button class="btn btn-secondary sort-btn" data-sort="recent">
+                  <i class="fas fa-clock"></i> Recent
+                </button>
+                <button class="btn btn-secondary sort-btn" data-sort="trending">
+                  <i class="fas fa-trending-up"></i> Trending
+                </button>
+              </div>
+              <div class="issue-count">
+                <span class="text-muted">
+                  <i class="fas fa-list"></i>
+                  <span id="issueCount">0</span> issues found
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Issues List -->
+          <div id="issuesList" class="issues-list">
+            <!-- Issues will be loaded here dynamically -->
+          </div>
+        </div>
+
+        <!-- Welcome Section (for non-logged users) -->
+        <div id="welcomeSection" class="welcome-section">
+          <div class="welcome-card">
+            <div class="welcome-header">
+              <div class="welcome-icon">
+                <i class="fas fa-vote-yea"></i>
+              </div>
+              <h2>Welcome to CivicPulse</h2>
+              <p class="lead">Your Community Voting Platform</p>
+            </div>
+            
+            <div class="features-grid">
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-comments"></i>
+                </div>
+                <h5>Report Community Issues</h5>
+                <p>Post problems you see in your neighborhood and community.</p>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-vote-yea"></i>
+                </div>
+                <h5>Vote on Priorities</h5>
+                <p>Help the community prioritize what matters most.</p>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-users"></i>
+                </div>
+                <h5>Community Collaboration</h5>
+                <p>Work with neighbors, local officials, and community leaders.</p>
+              </div>
+              <div class="feature-item">
+                <div class="feature-icon">
+                  <i class="fas fa-lightbulb"></i>
+                </div>
+                <h5>Find Solutions</h5>
+                <p>Co-create practical solutions together.</p>
+              </div>
+            </div>
+            
+            <div class="welcome-actions">
+              <h4>Join Our Community Today!</h4>
+              <p>
+                To access community issues and participate in discussions, please create an account.
+              </p>
+              <div class="action-buttons">
+                <a href="auth/register.html" class="btn btn-primary btn-lg">
+                  <i class="fas fa-user-plus"></i> Create Account
+                </a>
+                <a href="auth/login.html" class="btn btn-secondary btn-lg">
+                  <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links" style="display:flex;gap:16px;justify-content:center;padding:16px 0;">
+        <a href="pages/about.html">About</a>
+        <a href="pages/contact.html">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/voting.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
